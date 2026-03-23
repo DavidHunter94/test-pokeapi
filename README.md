@@ -1,122 +1,96 @@
-# QA PokéAPI — Script de verificación (Python)
+# PokéAPI – Script de verificación con Python
 
-Script en **Python** que realiza **10 verificaciones** contra la PokéAPI y muestra un **resumen `X/Y OK`** al finalizar.
+Proyecto de pruebas de API contra la **PokéAPI** (https://pokeapi.co), desarrollado como práctica de testing de APIs públicas.
 
----
-
-## Estructura del archivo
-
-**Nombre del archivo:** `test_pokeapi.py`
-
-- **Importaciones**
-  - `requests` — para realizar solicitudes HTTP.
-
-- **Constantes**
-  - `BASE = "https://pokeapi.co/api/v2"` — URL base usada para construir cada endpoint.
-
-- **Funciones de verificación (10)**
-  - `test_tc001_pikachu_por_nombre()`
-  - `test_tc002_tipo_water()`
-  - `test_tc003_tipo_fire()`
-  - `test_tc004_tipo_por_id_5()`
-  - `test_tc005_species_132_ditto()`
-  - `test_tc006_tipo_earth_no_existe()`
-  - `test_tc007_pokemon_pikachuu_no_existe()`
-  - `test_tc008_generacion_10_no_existe()`
-  - `test_tc009_species_1026_no_existe()`
-  - `test_tc010_color_11_no_existe()`
-
-- **Bloque de ejecución**
-  - `if __name__ == "__main__":`
-    - Declara la lista `tests` con las 10 funciones anteriores.
-    - Ejecuta cada función en orden.
-    - Imprime `[OK] nombre_de_la_función` si pasa sin lanzar excepción.
-    - Imprime `[FAIL]` o `[ERROR]` con detalle si ocurre una excepción.
-    - Muestra `RESULTADO FINAL: X/10 OK`.
-    - Finaliza con `sys.exit(0)` cuando todas pasan, o `sys.exit(1)` en caso contrario.
+Ejecuta 10 verificaciones y muestra un resumen `X/10 OK` al finalizar, validando tanto respuestas exitosas como manejo de errores 404.
 
 ---
 
-## Verificaciones realizadas (detalle por prueba)
+## 🧪 Casos de prueba
 
-### TC-001 — `GET /pokemon/pikachu` (200)
-- `r.status_code == 200`
-- `j["name"] == "pikachu"`
-- `j["id"] == 25`
-- `any(t["type"]["name"] == "electric" for t in j["types"])`
-- `isinstance(j["sprites"]["front_default"], str)` y comienza con `"http"`
-- `len(j["abilities"]) >= 1`
-- `len(j["stats"]) == 6`
-- `len(j["moves"]) >= 1`
+### Casos positivos (200)
+| ID | Endpoint | Validaciones |
+|---|---|---|
+| TC-001 | `GET /pokemon/pikachu` | nombre, id, tipo eléctrico, sprites, habilidades, stats, movimientos |
+| TC-002 | `GET /type/water` | status 200, nombre correcto |
+| TC-003 | `GET /type/fire` | status 200, nombre correcto |
+| TC-004 | `GET /type/5` | status 200, id y nombre válidos |
+| TC-005 | `GET /pokemon-species/132` | nombre "ditto", cadena evolutiva, nombres localizados |
 
-### TC-002 — `GET /type/water` (200)
-- `r.status_code == 200`
-- `j["name"] == "water"`
-
-### TC-003 — `GET /type/fire` (200)
-- `r.status_code == 200`
-- `j["name"] == "fire"`
-
-### TC-004 — `GET /type/5` (200)
-- `r.status_code == 200`
-- `isinstance(j["id"], int)` y `j["id"] > 0`
-- `isinstance(j["name"], str)` y `j["name"] != ""`
-
-### TC-005 — `GET /pokemon-species/132` (200)
-- `r.status_code == 200`
-- `j["name"] == "ditto"`
-- `isinstance(j["evolution_chain"]["url"], str)` y comienza con `"http"`
-- `any(n["language"]["name"] == "en" for n in j["names"])`
-
-### TC-006 — `GET /type/earth` (404)
-- `r.status_code == 404`
-
-### TC-007 — `GET /pokemon/pikachuu` (404)
-- `r.status_code == 404`
-
-### TC-008 — `GET /generation/10` (404)
-- `r.status_code == 404`
-
-### TC-009 — `GET /pokemon-species/1026` (404)
-- `r.status_code == 404`
-
-### TC-010 — `GET /pokemon-color/11` (404)
-- `r.status_code == 404`
+### Casos negativos (404)
+| ID | Endpoint | Validación |
+|---|---|---|
+| TC-006 | `GET /type/earth` | tipo inexistente → 404 |
+| TC-007 | `GET /pokemon/pikachuu` | typo en nombre → 404 |
+| TC-008 | `GET /generation/10` | generación inexistente → 404 |
+| TC-009 | `GET /pokemon-species/1026` | species inexistente → 404 |
+| TC-010 | `GET /pokemon-color/11` | color inexistente → 404 |
 
 ---
 
-## Flujo de salida
+## ⚙️ Tecnologías utilizadas
 
-Durante la ejecución, el script imprime una línea por función:
-```
-[OK] test_tc001_pikachu_por_nombre
-[OK] test_tc002_tipo_water
-...
-```
-Al final imprime:
-```
-RESULTADO FINAL: X/10 OK
-```
-y termina con código de salida **0** cuando `X == 10`, o **1** en caso contrario.
+- **Lenguaje:** Python 3.x
+- **Dependencia:** requests
+- **API:** PokéAPI v2 (https://pokeapi.co/api/v2)
 
 ---
 
-## Dependencias observadas en el código
+## 🏗️ Estructura del proyecto
 
-- `requests`
+```
+project/
+│
+├── test_pokeapi.py    ← Script principal con los 10 casos de prueba
+├── requirements.txt   ← Dependencias
+└── README.md
+```
 
 ---
 
-## Ejecución
+## ▶️ Instalación y ejecución
 
-```
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/DavidHunter94/test-pokeapi.git
+cd test-pokeapi
+
+# 2. Instalar dependencias
+pip install -r requirements.txt
+
+# 3. Ejecutar los tests
 python test_pokeapi.py
 ```
 
+Al finalizar verás algo así:
+
+```
+[OK] test_tc001_pikachu_por_nombre
+[OK] test_tc002_tipo_water
+[OK] test_tc003_tipo_fire
+[OK] test_tc004_tipo_por_id_5
+[OK] test_tc005_species_132_ditto
+[OK] test_tc006_tipo_earth_no_existe
+[OK] test_tc007_pokemon_pikachuu_no_existe
+[OK] test_tc008_generacion_10_no_existe
+[OK] test_tc009_species_1026_no_existe
+[OK] test_tc010_color_11_no_existe
+
+RESULTADO FINAL: 10/10 OK
+```
+
 ---
 
-## Autor y fuente original de los casos
+## 🔍 Detalles de implementación
 
-- **Autor**: Nicolas Benegas
-- **Página original**: APIMON RIVEIRA en Scribd — https://es.scribd.com/document/878211357/APIMON-RIVEIRA
-- **Documentación de los casos de prueba**: https://docs.google.com/spreadsheets/d/13jylpctWsb19tyo2FvaAidWQtY0Df3MLBDqTYJwicSU/edit?usp=sharing
+- Cada función de prueba es independiente y autocontenida
+- El bloque principal ejecuta las 10 funciones en orden y reporta resultados
+- Termina con `sys.exit(0)` si todas pasan, `sys.exit(1)` si alguna falla
+- No requiere pytest — corre directamente con `python`
+
+---
+
+## 🚀 Autor
+
+**Victor David Martínez Matías**
+QA Engineer con experiencia en pruebas manuales, automatización UI y pruebas de API.
